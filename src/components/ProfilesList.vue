@@ -16,7 +16,7 @@
     import ProfileItem from './ProfileItem.vue';
     import { useListStore } from '../store/useListStore'
 
-    const store = useListStore()
+    const store = useListStore();
 </script>
 <style lang="scss" scoped>
     .list {

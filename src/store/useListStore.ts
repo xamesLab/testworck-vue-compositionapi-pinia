@@ -1,38 +1,52 @@
-import { defineStore } from 'pinia'
+import { defineStore } from 'pinia';
+import { ProfilesList } from '../types';
+
+const MOCK_DATA = [
+    {
+        id: 1,
+        filled: true,
+        labels: [{ text: 'XXX' }],
+        type: 'Локальная',
+        login: 'werwer',
+        pass: 'ghjxc',
+    },
+    {
+        id: 2,
+        filled: true,
+        labels: [{ text: 'XXX' }, { text: 'YYYYY' }],
+        type: 'Локальная',
+        login: 'xcvxcv',
+        pass: 'ghjghj',
+    },
+    {
+        id: 3,
+        filled: false,
+        labels: [],
+        type: 'LDAP',
+        login: '',
+        pass: '',
+    },
+]
+
+const getLocalData = (): ProfilesList | null => {
+    const data = localStorage.getItem('profiles-list');
+
+    if(!data) return null;
+
+    return JSON.parse(data);
+};
 
 export const useListStore = defineStore('listStore', {
     state: () => ({
-        list: [
-            {
-                id: 1,
-                filled: true,
-                labels: [{ text: 'XXX' }],
-                type: 'Локальная',
-                login: 'werwer',
-                pass: 'ghjxc',
-            },
-            {
-                id: 2,
-                filled: true,
-                labels: [{ text: 'XXX' }, { text: 'YYYYY' }],
-                type: 'Локальная',
-                login: 'xcvxcv',
-                pass: 'ghjghj',
-            },
-            {
-                id: 3,
-                filled: false,
-                labels: [],
-                type: 'LDAP',
-                login: '',
-                pass: '',
-            },
-        ],
+        list: getLocalData() || MOCK_DATA,
     }),
   
     actions: {
+        setLocalData() {
+            localStorage.setItem('profiles-list', JSON.stringify(this.list));        
+        },
         addItem() {
-            const lastId = this.list.length > 0 ? this.list[this.list.length - 1].id : 0
+            const lastId = this.list.length > 0 ? this.list[this.list.length - 1].id : 0;
             const newItem = {
                 id: lastId + 1,
                 filled: false,
@@ -40,20 +54,23 @@ export const useListStore = defineStore('listStore', {
                 type: 'Локальная',
                 login: '',
                 pass: '',
-            }
-            this.list.push(newItem)
+            };
+            this.list.push(newItem);
+            this.setLocalData();
         },
   
         removeItem(id: number) {
-            this.list = this.list.filter(item => item.id !== id)
+            this.list = this.list.filter(item => item.id !== id);
+            this.setLocalData();
         },
     //TODO: fix any
         updateItem(id: number, key: string, value: any) {
-            const item = this.list.find(item => item.id === id)
+            const item = this.list.find(item => item.id === id);
             if (item) {
                 // @ts-ignore
                 item[key] = value
-            }
+            };
+            this.setLocalData();
         },
     },
 })

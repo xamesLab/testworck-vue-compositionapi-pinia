@@ -12,8 +12,6 @@ import { useListStore } from '../store/useListStore';
 const store = useListStore();
 
 const addNewItem = () => {
-    console.log('add');
-    
     store.addItem();
 }
 </script>
