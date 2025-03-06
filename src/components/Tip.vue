@@ -4,7 +4,7 @@
             <div class="tip__icon">
                 <v-icon>mdi-help-circle-outline</v-icon>
             </div>
-            <span class="tip__text">Для указания нескольких меток</span>
+            <span class="tip__text">Для указания нескольких меток для одной пары логин/пароль используйте разделитель ;</span>
         </div>
     </div>
 </template>

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ProfilesList } from '../types';
+import { ProfilesList, ListItem } from '../types';
 
 const MOCK_DATA = [
     {
@@ -63,12 +63,13 @@ export const useListStore = defineStore('listStore', {
             this.list = this.list.filter(item => item.id !== id);
             this.setLocalData();
         },
-    //TODO: fix any
-        updateItem(id: number, key: string, value: any) {
+        updateItem(id: number, data: ListItem) {
             const item = this.list.find(item => item.id === id);
             if (item) {
-                // @ts-ignore
-                item[key] = value
+                for(let i in item) {
+                    // @ts-ignore
+                    item[i] = data[i];
+                }                
             };
             this.setLocalData();
         },

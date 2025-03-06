@@ -6,7 +6,7 @@
             label="Введите текст" 
             outlined 
             hide-details
-            :rules="[(v) => v.length < 50]"
+            :rules="textRules"
             @blur="watchFields"
         />
         <v-select
@@ -31,6 +31,7 @@
             v-model="password"
             ref="passwordField"
             :type="showPassword ? 'text' : 'password'"
+            :rules="selectedOption === 'Локальная' ? passRules : []"
             label="Пароль"
             outlined
             hide-details
@@ -74,6 +75,15 @@
         (v) => !!v
     ]
 
+    const passRules = [
+        (v) => v.length < 100,
+        (v) => !!v
+    ]
+
+    const textRules = [
+        (v) => v.length < 50,
+    ]
+
     const togglePasswordVisibility = () => {
         showPassword.value = !showPassword.value;
     };
@@ -82,18 +92,51 @@
         store.removeItem(id);
     };
 
-    const validateForm = () => {
+    const normalizeLabel = () => {
+        const str = text.value;
+        if(!str.length) return [];
 
+        const strArray = str.split(';');
+        return strArray.map(i => ({text: i}));
+    }
+
+    const validateForm = async () => {
+        let isTextValid, isLoginValid, isPassValid;
+        const dataTextValid = await textField.value.validate();
+        const dataLoginValid = await loginField.value.validate();
+        const dataPassValid = await passwordField?.value?.validate();
+
+        if(!dataPassValid) {
+            isPassValid = true;
+            password.value = '';
+        } else {
+            isPassValid = !Object.keys(dataPassValid).length;
+        }
+
+        isTextValid = !Object.keys(dataTextValid).length;
+        isLoginValid = !Object.keys(dataLoginValid).length;
+
+        const isFormValid = isPassValid && isLoginValid && isTextValid;
+        
+        if(isFormValid) {
+            store.updateItem(props.item.id, {
+                id:props.item.id,
+                filled: true,
+                labels: normalizeLabel(),
+                type: selectedOption.value,
+                login: login.value,
+                pass: password.value
+            })
+        }
+    }
+
+    const watchFields = () => {
+        validateForm();
     }
 
     watch(selectedOption, (newValue) => {
         validateForm();        
     });
-
-    const watchFields = () => {
-        validateForm();
-        //console.log('watch', loginField.value.validate());
-    }
 </script>
 <style lang="scss" scoped>
     .item {
